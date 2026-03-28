@@ -10,10 +10,9 @@
   --color-a: #7c3aed;
   --color-d: #ea580c;
   --color-e: #0891b2;
-  --color-active: #2563eb;
+  --color-curve: #2563eb;
   --color-border: #d8e1ea;
   --color-text: #111;
-  --color-muted: #475569;
 }
 
 body {
@@ -35,45 +34,23 @@ body {
   border-radius: 18px;
   background: linear-gradient(135deg, #0f4c81 0%, #2563eb 55%, #60a5fa 100%);
   color: white;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
 }
 
 .hero-title h1 {
   margin: 0;
   font-size: 28px;
   line-height: 1.1;
-  letter-spacing: 0.2px;
 }
 
-.mode-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.mode-list button,
-.nav-buttons button {
-  border: none;
+.mode-title {
+  margin: 0 0 14px 0;
+  padding: 12px 14px;
   border-radius: 14px;
-  padding: 12px 10px;
-  font-size: 16px;
+  background: white;
+  border: 1px solid var(--color-border);
+  font-size: 22px;
   font-weight: 700;
-  background: #e8f0ff;
   color: #1847a8;
-  cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
-}
-
-.mode-list button:hover,
-.nav-buttons button:hover {
-  transform: translateY(-1px);
-}
-
-.mode-list button.active {
-  background: var(--color-active);
-  color: white;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
 }
 
 .graph-wrap {
@@ -82,7 +59,7 @@ body {
 
 svg {
   width: 100%;
-  height: 420px;
+  height: 430px;
   border: 1px solid var(--color-border);
   background: #fafcff;
   display: block;
@@ -94,20 +71,11 @@ svg {
   border: 1px solid var(--color-border);
   border-radius: 16px;
   background: white;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
-}
-
-.formula-display {
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 1.6;
-  margin-bottom: 14px;
-  color: #1847a8;
 }
 
 .slider-panel {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .slider-group {
@@ -119,83 +87,61 @@ svg {
   display: none;
 }
 
-.slider-group label {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.slider-group.a-group label {
-  color: var(--color-a);
-}
-
-.slider-group.d-group label {
-  color: var(--color-d);
-}
-
-.slider-group.e-group label {
-  color: var(--color-e);
-}
-
 .range-wrap {
   position: relative;
-  padding-top: 28px;
+  padding-top: 34px;
 }
 
 .value-badge {
   position: absolute;
   top: 0;
   transform: translateX(-50%);
-  min-width: 34px;
+  min-width: 36px;
   text-align: center;
-  padding: 2px 8px;
+  padding: 4px 9px;
   border-radius: 999px;
   color: white;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16);
   pointer-events: none;
   white-space: nowrap;
 }
 
-.value-badge.a-badge {
-  background: var(--color-a);
-}
-
-.value-badge.d-badge {
-  background: var(--color-d);
-}
-
-.value-badge.e-badge {
-  background: var(--color-e);
-}
+.value-badge.a-badge { background: var(--color-a); }
+.value-badge.d-badge { background: var(--color-d); }
+.value-badge.e-badge { background: var(--color-e); }
 
 input[type="range"] {
   width: 100%;
   margin: 0;
-  accent-color: var(--color-active);
 }
 
-#a {
-  accent-color: var(--color-a);
-}
-
-#d {
-  accent-color: var(--color-d);
-}
-
-#e {
-  accent-color: var(--color-e);
-}
+#a { accent-color: var(--color-a); }
+#d { accent-color: var(--color-d); }
+#e { accent-color: var(--color-e); }
 
 .nav-buttons {
   display: flex;
-  justify-content: space-between;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .nav-buttons button {
   flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 10px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #e8f0ff;
+  color: #1847a8;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+}
+
+.nav-buttons button:hover {
+  transform: translateY(-1px);
 }
 
 .nav-buttons button:disabled {
@@ -204,17 +150,28 @@ input[type="range"] {
   transform: none;
 }
 
+#btnNext.finish {
+  background: #2563eb;
+  color: white;
+}
+
+.ended .slider-panel,
+.ended .nav-buttons {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 @media (max-width: 700px) {
   svg {
-    height: 380px;
+    height: 390px;
   }
 
   .hero-title h1 {
     font-size: 23px;
   }
 
-  .formula-display {
-    font-size: 20px;
+  .mode-title {
+    font-size: 19px;
   }
 }
 
@@ -231,11 +188,10 @@ input[type="range"] {
     font-size: 20px;
   }
 
-  .formula-display {
+  .mode-title {
     font-size: 17px;
   }
 
-  .mode-list button,
   .nav-buttons button {
     font-size: 14px;
     padding: 11px 8px;
@@ -245,44 +201,34 @@ input[type="range"] {
 </head>
 
 <body>
-<div class="container">
+<div class="container" id="app">
   <div class="hero-title">
     <h1>Manipulation Normalparabel</h1>
   </div>
 
-  <div class="mode-list">
-    <button id="btnVertical" onclick="setMode('vertical')">Verschiebung in y-Richtung</button>
-    <button id="btnHorizontal" onclick="setMode('horizontal')">Verschiebung in x-Richtung</button>
-    <button id="btnOpen" onclick="setMode('open')">Streckung / Stauchung</button>
-    <button id="btnAll" onclick="setMode('all')">Alle Parameter</button>
-  </div>
+  <div class="mode-title" id="modeTitle"></div>
 
   <div class="graph-wrap">
     <svg id="svg"></svg>
   </div>
 
   <div class="form-panel">
-    <div class="formula-display" id="formulaDisplay"></div>
-
     <div class="slider-panel">
-      <div class="slider-group a-group" id="groupA">
-        <label for="a">a</label>
+      <div class="slider-group" id="groupA">
         <div class="range-wrap">
           <div class="value-badge a-badge" id="aBadge"></div>
           <input type="range" id="a" min="-5" max="5" step="1">
         </div>
       </div>
 
-      <div class="slider-group d-group" id="groupD">
-        <label for="d">d</label>
+      <div class="slider-group" id="groupD">
         <div class="range-wrap">
           <div class="value-badge d-badge" id="dBadge"></div>
           <input type="range" id="d" min="-5" max="5" step="1">
         </div>
       </div>
 
-      <div class="slider-group e-group" id="groupE">
-        <label for="e">e</label>
+      <div class="slider-group" id="groupE">
         <div class="range-wrap">
           <div class="value-badge e-badge" id="eBadge"></div>
           <input type="range" id="e" min="-5" max="5" step="1">
@@ -299,6 +245,9 @@ input[type="range"] {
 
 <script>
 const svg = document.getElementById("svg");
+const app = document.getElementById("app");
+const modeTitle = document.getElementById("modeTitle");
+
 const aSlider = document.getElementById("a");
 const dSlider = document.getElementById("d");
 const eSlider = document.getElementById("e");
@@ -306,30 +255,28 @@ const eSlider = document.getElementById("e");
 const aBadge = document.getElementById("aBadge");
 const dBadge = document.getElementById("dBadge");
 const eBadge = document.getElementById("eBadge");
-const formulaDisplay = document.getElementById("formulaDisplay");
 
 const groupA = document.getElementById("groupA");
 const groupD = document.getElementById("groupD");
 const groupE = document.getElementById("groupE");
 
-const btnVertical = document.getElementById("btnVertical");
-const btnHorizontal = document.getElementById("btnHorizontal");
-const btnOpen = document.getElementById("btnOpen");
-const btnAll = document.getElementById("btnAll");
-
 const btnPrev = document.getElementById("btnPrev");
 const btnNext = document.getElementById("btnNext");
 
-const modeOrder = ["vertical", "horizontal", "open", "all"];
-const modeButtons = {
-  vertical: btnVertical,
-  horizontal: btnHorizontal,
-  open: btnOpen,
-  all: btnAll
-};
+const modes = [
+  { key: "vertical", title: "Verschiebung in y-Richtung" },
+  { key: "horizontal", title: "Verschiebung in x-Richtung" },
+  { key: "open", title: "Streckung / Stauchung" },
+  { key: "all", title: "Alle Parameter" }
+];
 
-const xMin = -10, xMax = 10, yMin = -10, yMax = 10;
+const xMin = -10;
+const xMax = 10;
+const yMin = -8;   // etwas kleinerer Bereich im 3. und 4. Quadranten
+const yMax = 10;
+
 let currentMode = "vertical";
+let ended = false;
 
 function toX(x, w) {
   return (x - xMin) / (xMax - xMin) * w;
@@ -339,15 +286,15 @@ function toY(y, h) {
   return h - (y - yMin) / (yMax - yMin) * h;
 }
 
-function formatSigned(n) {
-  return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`;
+function formatSignedText(n) {
+  return n >= 0 ? ` + ${n}` : ` - ${Math.abs(n)}`;
 }
 
-function formatInner(d) {
+function formatInnerText(d) {
   return d >= 0 ? `(x - ${d})²` : `(x + ${Math.abs(d)})²`;
 }
 
-function formatA(a) {
+function formatAValue(a) {
   if (a === 1) return "";
   if (a === -1) return "-";
   return `${a}`;
@@ -361,37 +308,83 @@ function updateBadge(slider, badge, value) {
   badge.style.left = `calc(${percent}% + (${10 - percent * 0.2}px))`;
 }
 
-function updateFormula(a, d, e) {
+function buildFormulaParts(a, d, e) {
   if (currentMode === "vertical") {
-    formulaDisplay.textContent = `f(x) = x² ${formatSigned(e)}`;
+    return [
+      { text: "f(x) = x²", color: "#1847a8" },
+      { text: formatSignedText(e), color: "var(--color-e)" }
+    ];
   }
 
   if (currentMode === "horizontal") {
-    formulaDisplay.textContent = `f(x) = ${formatInner(d)}`;
+    if (d >= 0) {
+      return [
+        { text: "f(x) = (x - ", color: "#1847a8" },
+        { text: `${d}`, color: "var(--color-d)" },
+        { text: ")²", color: "#1847a8" }
+      ];
+    } else {
+      return [
+        { text: "f(x) = (x + ", color: "#1847a8" },
+        { text: `${Math.abs(d)}`, color: "var(--color-d)" },
+        { text: ")²", color: "#1847a8" }
+      ];
+    }
   }
 
   if (currentMode === "open") {
-    formulaDisplay.textContent = `f(x) = ${formatA(a)}x²`;
+    return [
+      { text: "f(x) = ", color: "#1847a8" },
+      { text: formatAValue(a), color: "var(--color-a)" },
+      { text: "x²", color: "#1847a8" }
+    ];
   }
 
-  if (currentMode === "all") {
-    formulaDisplay.textContent = `f(x) = ${formatA(a)}${formatInner(d)} ${formatSigned(e)}`;
+  const parts = [
+    { text: "f(x) = ", color: "#1847a8" },
+    { text: formatAValue(a), color: "var(--color-a)" }
+  ];
+
+  if (d >= 0) {
+    parts.push({ text: "(x - ", color: "#1847a8" });
+    parts.push({ text: `${d}`, color: "var(--color-d)" });
+    parts.push({ text: ")²", color: "#1847a8" });
+  } else {
+    parts.push({ text: "(x + ", color: "#1847a8" });
+    parts.push({ text: `${Math.abs(d)}`, color: "var(--color-d)" });
+    parts.push({ text: ")²", color: "#1847a8" });
   }
+
+  parts.push({ text: e >= 0 ? " + " : " - ", color: "#1847a8" });
+  parts.push({ text: `${Math.abs(e)}`, color: "var(--color-e)" });
+
+  return parts;
 }
 
-function setActiveButton(mode) {
-  Object.entries(modeButtons).forEach(([key, btn]) => {
-    btn.classList.toggle("active", key === mode);
-  });
+function updateModeTitle() {
+  const current = modes.find(m => m.key === currentMode);
+  modeTitle.textContent = ended ? "Ende" : current.title;
 }
 
 function updateNavButtons() {
-  const index = modeOrder.indexOf(currentMode);
-  btnPrev.disabled = index === 0;
-  btnNext.disabled = index === modeOrder.length - 1;
+  const index = modes.findIndex(m => m.key === currentMode);
+  btnPrev.disabled = ended || index === 0;
+
+  if (ended) {
+    btnNext.textContent = "Ende";
+    btnNext.disabled = true;
+    btnNext.classList.add("finish");
+    return;
+  }
+
+  const isLast = index === modes.length - 1;
+  btnNext.textContent = isLast ? "Ende" : "Weiter";
+  btnNext.classList.toggle("finish", isLast);
 }
 
 function setMode(mode) {
+  if (ended) return;
+
   currentMode = mode;
 
   if (mode === "vertical") {
@@ -416,9 +409,7 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     dSlider.value = 0;
     eSlider.value = 0;
-    if (parseInt(aSlider.value, 10) === 0) {
-      aSlider.value = 1;
-    }
+    if (parseInt(aSlider.value, 10) === 0) aSlider.value = 1;
   }
 
   if (mode === "all") {
@@ -427,40 +418,37 @@ function setMode(mode) {
     groupE.classList.remove("hidden");
   }
 
-  setActiveButton(mode);
+  updateModeTitle();
   updateNavButtons();
   draw();
 }
 
 function goPrev() {
-  const index = modeOrder.indexOf(currentMode);
-  if (index > 0) {
-    setMode(modeOrder[index - 1]);
-  }
+  if (ended) return;
+  const index = modes.findIndex(m => m.key === currentMode);
+  if (index > 0) setMode(modes[index - 1].key);
+}
+
+function endApp() {
+  ended = true;
+  app.classList.add("ended");
+  updateModeTitle();
+  updateNavButtons();
 }
 
 function goNext() {
-  const index = modeOrder.indexOf(currentMode);
-  if (index < modeOrder.length - 1) {
-    setMode(modeOrder[index + 1]);
+  if (ended) return;
+
+  const index = modes.findIndex(m => m.key === currentMode);
+  if (index === modes.length - 1) {
+    endApp();
+    return;
   }
+
+  setMode(modes[index + 1].key);
 }
 
-function draw() {
-  const a = parseInt(aSlider.value, 10);
-  const d = parseInt(dSlider.value, 10);
-  const e = parseInt(eSlider.value, 10);
-
-  updateBadge(aSlider, aBadge, a);
-  updateBadge(dSlider, dBadge, d);
-  updateBadge(eSlider, eBadge, e);
-  updateFormula(a, d, e);
-
-  const w = svg.clientWidth;
-  const h = svg.clientHeight;
-
-  svg.innerHTML = "";
-
+function drawAxesAndGrid(w, h) {
   for (let x = Math.ceil(xMin); x <= xMax; x++) {
     const px = toX(x, w);
     svg.innerHTML += `<line x1="${px}" y1="0" x2="${px}" y2="${h}" stroke="#dde4ec" stroke-width="1"/>`;
@@ -473,11 +461,9 @@ function draw() {
 
   svg.innerHTML += `<line x1="0" y1="${toY(0, h)}" x2="${w}" y2="${toY(0, h)}" stroke="black" stroke-width="2"/>`;
   svg.innerHTML += `<line x1="${toX(0, w)}" y1="0" x2="${toX(0, w)}" y2="${h}" stroke="black" stroke-width="2"/>`;
+}
 
-  const nx = -2.2;
-  const ny = nx * nx;
-  svg.innerHTML += `<text x="${toX(nx, w)}" y="${toY(ny, h) - 10}" fill="black" font-size="18" font-weight="bold">x²</text>`;
-
+function drawReferenceParabola(w, h) {
   let p1 = "";
   for (let i = 0; i <= 900; i++) {
     const x = xMin + i * (xMax - xMin) / 900;
@@ -486,17 +472,55 @@ function draw() {
   }
   svg.innerHTML += `<polyline points="${p1}" fill="none" stroke="black" stroke-width="4"/>`;
 
+  const nx = -2.2;
+  const ny = nx * nx;
+  svg.innerHTML += `<text x="${toX(nx, w)}" y="${toY(ny, h) - 10}" fill="black" font-size="18" font-weight="bold">x²</text>`;
+}
+
+function drawManipulatedParabola(a, d, e, w, h) {
   let p2 = "";
   for (let i = 0; i <= 900; i++) {
     const x = xMin + i * (xMax - xMin) / 900;
     const y = a * Math.pow(x - d, 2) + e;
     p2 += `${toX(x, w)},${toY(y, h)} `;
   }
-  svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="#2563eb" stroke-width="4"/>`;
+  svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="var(--color-curve)" stroke-width="4"/>`;
+}
 
-  const px = toX(d, w);
-  const py = toY(e, h);
-  svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
+function drawFormulaInSvg(a, d, e, w, h) {
+  const parts = buildFormulaParts(a, d, e);
+  const baseX = 18;
+  const baseY = h - 18;
+
+  let tspans = "";
+  for (const part of parts) {
+    tspans += `<tspan fill="${part.color}">${part.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</tspan>`;
+  }
+
+  svg.innerHTML += `
+    <text x="${baseX}" y="${baseY}" font-size="28" font-weight="700" font-family="Arial, sans-serif">
+      ${tspans}
+    </text>
+  `;
+}
+
+function draw() {
+  const a = parseInt(aSlider.value, 10);
+  const d = parseInt(dSlider.value, 10);
+  const e = parseInt(eSlider.value, 10);
+
+  updateBadge(aSlider, aBadge, a);
+  updateBadge(dSlider, dBadge, d);
+  updateBadge(eSlider, eBadge, e);
+
+  const w = svg.clientWidth;
+  const h = svg.clientHeight;
+  svg.innerHTML = "";
+
+  drawAxesAndGrid(w, h);
+  drawReferenceParabola(w, h);
+  drawManipulatedParabola(a, d, e, w, h);
+  drawFormulaInSvg(a, d, e, w, h);
 }
 
 aSlider.value = 1;

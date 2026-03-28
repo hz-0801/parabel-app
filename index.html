@@ -272,7 +272,7 @@ const modes = [
 
 const xMin = -10;
 const xMax = 10;
-const yMin = -8;   // etwas kleinerer Bereich im 3. und 4. Quadranten
+const yMin = -8;
 const yMax = 10;
 
 let currentMode = "vertical";
@@ -295,9 +295,11 @@ function formatInnerText(d) {
 }
 
 function formatAValue(a) {
-  if (a === 1) return "";
-  if (a === -1) return "-";
   return `${a}`;
+}
+
+function clampANonZero(value) {
+  return value === 0 ? 1 : value;
 }
 
 function updateBadge(slider, badge, value) {
@@ -306,6 +308,23 @@ function updateBadge(slider, badge, value) {
   const percent = ((value - min) / (max - min)) * 100;
   badge.textContent = value;
   badge.style.left = `calc(${percent}% + (${10 - percent * 0.2}px))`;
+}
+
+function updateABadge(value) {
+  const min = Number(aSlider.min);
+  const max = Number(aSlider.max);
+  const centeredMin = 1;
+  const centeredMax = 5;
+
+  let percent;
+  if (value >= 1) {
+    percent = 50 + ((value - centeredMin) / (centeredMax - centeredMin)) * 50;
+  } else {
+    percent = ((value - min) / (1 - min)) * 50;
+  }
+
+  aBadge.textContent = value;
+  aBadge.style.left = `${percent}%`;
 }
 
 function buildFormulaParts(a, d, e) {
@@ -335,14 +354,14 @@ function buildFormulaParts(a, d, e) {
   if (currentMode === "open") {
     return [
       { text: "f(x) = ", color: "#1847a8" },
-      { text: formatAValue(a), color: "var(--color-a)" },
+      { text: `${a}`, color: "var(--color-a)" },
       { text: "x²", color: "#1847a8" }
     ];
   }
 
   const parts = [
     { text: "f(x) = ", color: "#1847a8" },
-    { text: formatAValue(a), color: "var(--color-a)" }
+    { text: `${a}`, color: "var(--color-a)" }
   ];
 
   if (d >= 0) {
@@ -380,6 +399,14 @@ function updateNavButtons() {
   const isLast = index === modes.length - 1;
   btnNext.textContent = isLast ? "Ende" : "Weiter";
   btnNext.classList.toggle("finish", isLast);
+  btnNext.disabled = false;
+}
+
+function syncAFromInput() {
+  let value = parseInt(aSlider.value, 10);
+  value = clampANonZero(value);
+  aSlider.value = value;
+  return value;
 }
 
 function setMode(mode) {
@@ -409,13 +436,14 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     dSlider.value = 0;
     eSlider.value = 0;
-    if (parseInt(aSlider.value, 10) === 0) aSlider.value = 1;
+    syncAFromInput();
   }
 
   if (mode === "all") {
     groupA.classList.remove("hidden");
     groupD.classList.remove("hidden");
     groupE.classList.remove("hidden");
+    syncAFromInput();
   }
 
   updateModeTitle();
@@ -505,11 +533,14 @@ function drawFormulaInSvg(a, d, e, w, h) {
 }
 
 function draw() {
-  const a = parseInt(aSlider.value, 10);
+  let a = parseInt(aSlider.value, 10);
   const d = parseInt(dSlider.value, 10);
   const e = parseInt(eSlider.value, 10);
 
-  updateBadge(aSlider, aBadge, a);
+  a = clampANonZero(a);
+  aSlider.value = a;
+
+  updateABadge(a);
   updateBadge(dSlider, dBadge, d);
   updateBadge(eSlider, eBadge, e);
 
@@ -527,7 +558,12 @@ aSlider.value = 1;
 dSlider.value = 0;
 eSlider.value = 0;
 
-[aSlider, dSlider, eSlider].forEach(el => {
+aSlider.addEventListener("input", () => {
+  syncAFromInput();
+  draw();
+});
+
+[dSlider, eSlider].forEach(el => {
   el.addEventListener("input", draw);
 });
 

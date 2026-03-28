@@ -101,7 +101,7 @@ svg {
 
 .slider-panel {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .slider-group {
@@ -119,8 +119,41 @@ svg {
   color: #1e293b;
 }
 
+.range-wrap {
+  position: relative;
+  padding-top: 26px;
+}
+
+.value-badge {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 34px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
 input[type="range"] {
   width: 100%;
+}
+
+.range-hints {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.range-hints span.center {
+  font-weight: 700;
+  color: #334155;
 }
 
 .value-negative {
@@ -186,6 +219,10 @@ input[type="range"] {
     font-size: 14px;
     padding: 11px 8px;
   }
+
+  .range-hints {
+    font-size: 12px;
+  }
 }
 </style>
 </head>
@@ -213,18 +250,42 @@ input[type="range"] {
 
     <div class="slider-panel">
       <div class="slider-group" id="groupA">
-        <label for="a">a = <span id="aValue"></span></label>
-        <input type="range" id="a" min="-5" max="5" step="1">
+        <label for="a">a</label>
+        <div class="range-wrap">
+          <div class="value-badge" id="aBadge"></div>
+          <input type="range" id="a" min="-5" max="5" step="1">
+        </div>
+        <div class="range-hints" id="aHints">
+          <span>nach unten geöffnet</span>
+          <span class="center">keine Änderung</span>
+          <span>nach oben geöffnet</span>
+        </div>
       </div>
 
       <div class="slider-group" id="groupD">
-        <label for="d">d = <span id="dValue"></span></label>
-        <input type="range" id="d" min="-5" max="5" step="1">
+        <label for="d">d</label>
+        <div class="range-wrap">
+          <div class="value-badge" id="dBadge"></div>
+          <input type="range" id="d" min="-5" max="5" step="1">
+        </div>
+        <div class="range-hints" id="dHints">
+          <span>links</span>
+          <span class="center">keine Verschiebung</span>
+          <span>rechts</span>
+        </div>
       </div>
 
       <div class="slider-group" id="groupE">
-        <label for="e">e = <span id="eValue"></span></label>
-        <input type="range" id="e" min="-5" max="5" step="1">
+        <label for="e">e</label>
+        <div class="range-wrap">
+          <div class="value-badge" id="eBadge"></div>
+          <input type="range" id="e" min="-5" max="5" step="1">
+        </div>
+        <div class="range-hints" id="eHints">
+          <span>nach unten</span>
+          <span class="center">keine Verschiebung</span>
+          <span>nach oben</span>
+        </div>
       </div>
     </div>
 
@@ -238,9 +299,9 @@ const aSelect = document.getElementById("a");
 const dSelect = document.getElementById("d");
 const eSelect = document.getElementById("e");
 
-const aValue = document.getElementById("aValue");
-const dValue = document.getElementById("dValue");
-const eValue = document.getElementById("eValue");
+const aBadge = document.getElementById("aBadge");
+const dBadge = document.getElementById("dBadge");
+const eBadge = document.getElementById("eBadge");
 const formulaDisplay = document.getElementById("formulaDisplay");
 
 const groupA = document.getElementById("groupA");
@@ -277,6 +338,12 @@ function formatInner(d) {
   return d >= 0 ? `(x - ${d})²` : `(x + ${Math.abs(d)})²`;
 }
 
+function formatA(a) {
+  if (a === 1) return "";
+  if (a === -1) return "-";
+  return `${a}`;
+}
+
 function updateValueColor(element, value) {
   element.classList.remove("value-negative", "value-positive", "value-zero");
 
@@ -289,6 +356,15 @@ function updateValueColor(element, value) {
   }
 }
 
+function updateBadge(slider, badge, value) {
+  const min = Number(slider.min);
+  const max = Number(slider.max);
+  const percent = ((value - min) / (max - min)) * 100;
+  badge.textContent = value;
+  badge.style.left = `calc(${percent}% + (${10 - percent * 0.2}px))`;
+  updateValueColor(badge, value);
+}
+
 function updateFormula(a, d, e) {
   if (currentMode === "vertical") {
     formulaDisplay.textContent = `f(x) = x² ${formatSigned(e)}`;
@@ -299,11 +375,11 @@ function updateFormula(a, d, e) {
   }
 
   if (currentMode === "open") {
-    formulaDisplay.textContent = `f(x) = ${a}x²`;
+    formulaDisplay.textContent = `f(x) = ${formatA(a)}x²`;
   }
 
   if (currentMode === "all") {
-    formulaDisplay.textContent = `f(x) = ${a}${formatInner(d)} ${formatSigned(e)}`;
+    formulaDisplay.textContent = `f(x) = ${formatA(a)}${formatInner(d)} ${formatSigned(e)}`;
   }
 }
 
@@ -323,7 +399,7 @@ function setMode(mode) {
     groupE.classList.remove("hidden");
     aSelect.value = 1;
     dSelect.value = 0;
-    helperText.textContent = "Verschiebung der Normalparabel nach oben oder unten: f(x) = x² + e";
+    helperText.textContent = "Vorschlag: Der Wert folgt direkt dem Regler. Zusätzlich zeigt die Beschriftung unter dem Regler die Richtung an: links nach unten, rechts nach oben.";
     setActiveButton(btnVertical);
   }
 
@@ -333,7 +409,7 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     aSelect.value = 1;
     eSelect.value = 0;
-    helperText.textContent = "Verschiebung der Normalparabel nach links oder rechts: f(x) = (x - d)²";
+    helperText.textContent = "Die Bereiche sind gekennzeichnet: links für Verschiebung nach links, rechts für Verschiebung nach rechts.";
     setActiveButton(btnHorizontal);
   }
 
@@ -343,7 +419,7 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     dSelect.value = 0;
     eSelect.value = 0;
-    helperText.textContent = "Streckung oder Stauchung der Normalparabel: f(x) = ax²";
+    helperText.textContent = "Die Bereiche sind gekennzeichnet: links negative a-Werte, rechts positive a-Werte. Kleine Beträge stauchen, große Beträge strecken.";
     setActiveButton(btnOpen);
   }
 
@@ -351,7 +427,7 @@ function setMode(mode) {
     groupA.classList.remove("hidden");
     groupD.classList.remove("hidden");
     groupE.classList.remove("hidden");
-    helperText.textContent = "Manipulation mit allen Parametern: f(x) = a(x - d)² + e";
+    helperText.textContent = "Die Werte folgen direkt den Reglern. Die Funktionsgleichung steht unten, im Koordinatensystem wird sie nicht mehr angezeigt.";
     setActiveButton(btnAll);
   }
 
@@ -363,13 +439,9 @@ function draw() {
   const d = parseInt(dSelect.value, 10);
   const e = parseInt(eSelect.value, 10);
 
-  aValue.textContent = a;
-  dValue.textContent = d;
-  eValue.textContent = e;
-
-  updateValueColor(aValue, a);
-  updateValueColor(dValue, d);
-  updateValueColor(eValue, e);
+  updateBadge(aSelect, aBadge, a);
+  updateBadge(dSelect, dBadge, d);
+  updateBadge(eSelect, eBadge, e);
   updateFormula(a, d, e);
 
   const w = svg.clientWidth;
@@ -413,25 +485,6 @@ function draw() {
   const px = toX(d, w);
   const py = toY(e, h);
   svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
-
-  const labelXValue = d + 1.2;
-  const labelYValue = a * Math.pow(labelXValue - d, 2) + e;
-  const labelText = `f(x) = ${snum(a)}(x - ${snum(d)})² + ${snum(e)}`;
-
-  let textX = toX(labelXValue, w) + 8;
-  let textY = toY(labelYValue, h) - 8;
-  let anchor = "start";
-
-  if (textX > w - 170) {
-    textX = toX(labelXValue, w) - 8;
-    anchor = "end";
-  }
-
-  if (textY < 20) {
-    textY = toY(labelYValue, h) + 22;
-  }
-
-  svg.innerHTML += `<text x="${textX}" y="${textY}" text-anchor="${anchor}" fill="blue" font-size="18" font-weight="bold">${labelText}</text>`;
 }
 
 aSelect.value = 1;

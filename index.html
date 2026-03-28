@@ -6,11 +6,21 @@
 <title>Manipulation Normalparabel</title>
 
 <style>
+:root {
+  --color-a: #7c3aed;
+  --color-d: #ea580c;
+  --color-e: #0891b2;
+  --color-active: #2563eb;
+  --color-border: #d8e1ea;
+  --color-text: #111;
+  --color-muted: #475569;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
-  color: #111;
+  color: var(--color-text);
 }
 
 .container {
@@ -35,14 +45,15 @@ body {
   letter-spacing: 0.2px;
 }
 
-.mode-buttons {
+.mode-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
   gap: 8px;
   margin-bottom: 14px;
 }
 
-.mode-buttons button {
+.mode-list button,
+.nav-buttons button {
   border: none;
   border-radius: 14px;
   padding: 12px 10px;
@@ -51,15 +62,16 @@ body {
   background: #e8f0ff;
   color: #1847a8;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
 }
 
-.mode-buttons button:hover {
+.mode-list button:hover,
+.nav-buttons button:hover {
   transform: translateY(-1px);
 }
 
-.mode-buttons button.active {
-  background: #2563eb;
+.mode-list button.active {
+  background: var(--color-active);
   color: white;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
 }
@@ -71,7 +83,7 @@ body {
 svg {
   width: 100%;
   height: 420px;
-  border: 1px solid #d8e1ea;
+  border: 1px solid var(--color-border);
   background: #fafcff;
   display: block;
   border-radius: 16px;
@@ -79,19 +91,13 @@ svg {
 
 .form-panel {
   padding: 12px 14px;
-  border: 1px solid #d8e1ea;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   background: white;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
 }
 
-.form-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.vertex-form {
+.formula-display {
   font-size: 24px;
   font-weight: bold;
   line-height: 1.6;
@@ -101,7 +107,7 @@ svg {
 
 .slider-panel {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .slider-group {
@@ -116,12 +122,23 @@ svg {
 .slider-group label {
   font-size: 16px;
   font-weight: 700;
-  color: #1e293b;
+}
+
+.slider-group.a-group label {
+  color: var(--color-a);
+}
+
+.slider-group.d-group label {
+  color: var(--color-d);
+}
+
+.slider-group.e-group label {
+  color: var(--color-e);
 }
 
 .range-wrap {
   position: relative;
-  padding-top: 26px;
+  padding-top: 28px;
 }
 
 .value-badge {
@@ -132,52 +149,59 @@ svg {
   text-align: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: #2563eb;
   color: white;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.value-badge.a-badge {
+  background: var(--color-a);
+}
+
+.value-badge.d-badge {
+  background: var(--color-d);
+}
+
+.value-badge.e-badge {
+  background: var(--color-e);
 }
 
 input[type="range"] {
   width: 100%;
+  margin: 0;
+  accent-color: var(--color-active);
 }
 
-.range-hints {
+#a {
+  accent-color: var(--color-a);
+}
+
+#d {
+  accent-color: var(--color-d);
+}
+
+#e {
+  accent-color: var(--color-e);
+}
+
+.nav-buttons {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  color: #64748b;
+  gap: 10px;
+  margin-top: 16px;
 }
 
-.range-hints span.center {
-  font-weight: 700;
-  color: #334155;
+.nav-buttons button {
+  flex: 1;
 }
 
-.value-negative {
-  color: #c62828;
-}
-
-.value-positive {
-  color: #1565c0;
-}
-
-.value-zero {
-  color: #111;
-}
-
-.helper-text {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #475569;
-}
-
-@media (max-width: 820px) {
-  .mode-buttons {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.nav-buttons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 @media (max-width: 700px) {
@@ -189,7 +213,7 @@ input[type="range"] {
     font-size: 23px;
   }
 
-  .vertex-form {
+  .formula-display {
     font-size: 20px;
   }
 }
@@ -207,21 +231,14 @@ input[type="range"] {
     font-size: 20px;
   }
 
-  .form-title {
-    font-size: 14px;
-  }
-
-  .vertex-form {
+  .formula-display {
     font-size: 17px;
   }
 
-  .mode-buttons button {
+  .mode-list button,
+  .nav-buttons button {
     font-size: 14px;
     padding: 11px 8px;
-  }
-
-  .range-hints {
-    font-size: 12px;
   }
 }
 </style>
@@ -233,8 +250,8 @@ input[type="range"] {
     <h1>Manipulation Normalparabel</h1>
   </div>
 
-  <div class="mode-buttons">
-    <button id="btnVertical" class="active" onclick="setMode('vertical')">Verschiebung in y-Richtung</button>
+  <div class="mode-list">
+    <button id="btnVertical" onclick="setMode('vertical')">Verschiebung in y-Richtung</button>
     <button id="btnHorizontal" onclick="setMode('horizontal')">Verschiebung in x-Richtung</button>
     <button id="btnOpen" onclick="setMode('open')">Streckung / Stauchung</button>
     <button id="btnAll" onclick="setMode('all')">Alle Parameter</button>
@@ -245,59 +262,46 @@ input[type="range"] {
   </div>
 
   <div class="form-panel">
-    <div class="form-title">Funktionsform</div>
-    <div class="vertex-form" id="formulaDisplay"></div>
+    <div class="formula-display" id="formulaDisplay"></div>
 
     <div class="slider-panel">
-      <div class="slider-group" id="groupA">
+      <div class="slider-group a-group" id="groupA">
         <label for="a">a</label>
         <div class="range-wrap">
-          <div class="value-badge" id="aBadge"></div>
+          <div class="value-badge a-badge" id="aBadge"></div>
           <input type="range" id="a" min="-5" max="5" step="1">
         </div>
-        <div class="range-hints" id="aHints">
-          <span>nach unten geöffnet</span>
-          <span class="center">keine Änderung</span>
-          <span>nach oben geöffnet</span>
-        </div>
       </div>
 
-      <div class="slider-group" id="groupD">
+      <div class="slider-group d-group" id="groupD">
         <label for="d">d</label>
         <div class="range-wrap">
-          <div class="value-badge" id="dBadge"></div>
+          <div class="value-badge d-badge" id="dBadge"></div>
           <input type="range" id="d" min="-5" max="5" step="1">
-        </div>
-        <div class="range-hints" id="dHints">
-          <span>links</span>
-          <span class="center">keine Verschiebung</span>
-          <span>rechts</span>
         </div>
       </div>
 
-      <div class="slider-group" id="groupE">
+      <div class="slider-group e-group" id="groupE">
         <label for="e">e</label>
         <div class="range-wrap">
-          <div class="value-badge" id="eBadge"></div>
+          <div class="value-badge e-badge" id="eBadge"></div>
           <input type="range" id="e" min="-5" max="5" step="1">
-        </div>
-        <div class="range-hints" id="eHints">
-          <span>nach unten</span>
-          <span class="center">keine Verschiebung</span>
-          <span>nach oben</span>
         </div>
       </div>
     </div>
 
-    <div class="helper-text" id="helperText"></div>
+    <div class="nav-buttons">
+      <button id="btnPrev" onclick="goPrev()">Zurück</button>
+      <button id="btnNext" onclick="goNext()">Weiter</button>
+    </div>
   </div>
 </div>
 
 <script>
 const svg = document.getElementById("svg");
-const aSelect = document.getElementById("a");
-const dSelect = document.getElementById("d");
-const eSelect = document.getElementById("e");
+const aSlider = document.getElementById("a");
+const dSlider = document.getElementById("d");
+const eSlider = document.getElementById("e");
 
 const aBadge = document.getElementById("aBadge");
 const dBadge = document.getElementById("dBadge");
@@ -308,12 +312,21 @@ const groupA = document.getElementById("groupA");
 const groupD = document.getElementById("groupD");
 const groupE = document.getElementById("groupE");
 
-const helperText = document.getElementById("helperText");
-
 const btnVertical = document.getElementById("btnVertical");
 const btnHorizontal = document.getElementById("btnHorizontal");
 const btnOpen = document.getElementById("btnOpen");
 const btnAll = document.getElementById("btnAll");
+
+const btnPrev = document.getElementById("btnPrev");
+const btnNext = document.getElementById("btnNext");
+
+const modeOrder = ["vertical", "horizontal", "open", "all"];
+const modeButtons = {
+  vertical: btnVertical,
+  horizontal: btnHorizontal,
+  open: btnOpen,
+  all: btnAll
+};
 
 const xMin = -10, xMax = 10, yMin = -10, yMax = 10;
 let currentMode = "vertical";
@@ -324,10 +337,6 @@ function toX(x, w) {
 
 function toY(y, h) {
   return h - (y - yMin) / (yMax - yMin) * h;
-}
-
-function snum(n) {
-  return Number(n).toString();
 }
 
 function formatSigned(n) {
@@ -344,25 +353,12 @@ function formatA(a) {
   return `${a}`;
 }
 
-function updateValueColor(element, value) {
-  element.classList.remove("value-negative", "value-positive", "value-zero");
-
-  if (value < 0) {
-    element.classList.add("value-negative");
-  } else if (value > 0) {
-    element.classList.add("value-positive");
-  } else {
-    element.classList.add("value-zero");
-  }
-}
-
 function updateBadge(slider, badge, value) {
   const min = Number(slider.min);
   const max = Number(slider.max);
   const percent = ((value - min) / (max - min)) * 100;
   badge.textContent = value;
   badge.style.left = `calc(${percent}% + (${10 - percent * 0.2}px))`;
-  updateValueColor(badge, value);
 }
 
 function updateFormula(a, d, e) {
@@ -383,11 +379,16 @@ function updateFormula(a, d, e) {
   }
 }
 
-function setActiveButton(activeBtn) {
-  [btnVertical, btnHorizontal, btnOpen, btnAll].forEach(btn => {
-    btn.classList.remove("active");
+function setActiveButton(mode) {
+  Object.entries(modeButtons).forEach(([key, btn]) => {
+    btn.classList.toggle("active", key === mode);
   });
-  activeBtn.classList.add("active");
+}
+
+function updateNavButtons() {
+  const index = modeOrder.indexOf(currentMode);
+  btnPrev.disabled = index === 0;
+  btnNext.disabled = index === modeOrder.length - 1;
 }
 
 function setMode(mode) {
@@ -397,51 +398,62 @@ function setMode(mode) {
     groupA.classList.add("hidden");
     groupD.classList.add("hidden");
     groupE.classList.remove("hidden");
-    aSelect.value = 1;
-    dSelect.value = 0;
-    helperText.textContent = "Vorschlag: Der Wert folgt direkt dem Regler. Zusätzlich zeigt die Beschriftung unter dem Regler die Richtung an: links nach unten, rechts nach oben.";
-    setActiveButton(btnVertical);
+    aSlider.value = 1;
+    dSlider.value = 0;
   }
 
   if (mode === "horizontal") {
     groupA.classList.add("hidden");
     groupD.classList.remove("hidden");
     groupE.classList.add("hidden");
-    aSelect.value = 1;
-    eSelect.value = 0;
-    helperText.textContent = "Die Bereiche sind gekennzeichnet: links für Verschiebung nach links, rechts für Verschiebung nach rechts.";
-    setActiveButton(btnHorizontal);
+    aSlider.value = 1;
+    eSlider.value = 0;
   }
 
   if (mode === "open") {
     groupA.classList.remove("hidden");
     groupD.classList.add("hidden");
     groupE.classList.add("hidden");
-    dSelect.value = 0;
-    eSelect.value = 0;
-    helperText.textContent = "Die Bereiche sind gekennzeichnet: links negative a-Werte, rechts positive a-Werte. Kleine Beträge stauchen, große Beträge strecken.";
-    setActiveButton(btnOpen);
+    dSlider.value = 0;
+    eSlider.value = 0;
+    if (parseInt(aSlider.value, 10) === 0) {
+      aSlider.value = 1;
+    }
   }
 
   if (mode === "all") {
     groupA.classList.remove("hidden");
     groupD.classList.remove("hidden");
     groupE.classList.remove("hidden");
-    helperText.textContent = "Die Werte folgen direkt den Reglern. Die Funktionsgleichung steht unten, im Koordinatensystem wird sie nicht mehr angezeigt.";
-    setActiveButton(btnAll);
   }
 
+  setActiveButton(mode);
+  updateNavButtons();
   draw();
 }
 
-function draw() {
-  const a = parseInt(aSelect.value, 10);
-  const d = parseInt(dSelect.value, 10);
-  const e = parseInt(eSelect.value, 10);
+function goPrev() {
+  const index = modeOrder.indexOf(currentMode);
+  if (index > 0) {
+    setMode(modeOrder[index - 1]);
+  }
+}
 
-  updateBadge(aSelect, aBadge, a);
-  updateBadge(dSelect, dBadge, d);
-  updateBadge(eSelect, eBadge, e);
+function goNext() {
+  const index = modeOrder.indexOf(currentMode);
+  if (index < modeOrder.length - 1) {
+    setMode(modeOrder[index + 1]);
+  }
+}
+
+function draw() {
+  const a = parseInt(aSlider.value, 10);
+  const d = parseInt(dSlider.value, 10);
+  const e = parseInt(eSlider.value, 10);
+
+  updateBadge(aSlider, aBadge, a);
+  updateBadge(dSlider, dBadge, d);
+  updateBadge(eSlider, eBadge, e);
   updateFormula(a, d, e);
 
   const w = svg.clientWidth;
@@ -480,22 +492,23 @@ function draw() {
     const y = a * Math.pow(x - d, 2) + e;
     p2 += `${toX(x, w)},${toY(y, h)} `;
   }
-  svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="blue" stroke-width="4"/>`;
+  svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="#2563eb" stroke-width="4"/>`;
 
   const px = toX(d, w);
   const py = toY(e, h);
   svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
 }
 
-aSelect.value = 1;
-dSelect.value = 0;
-eSelect.value = 0;
+aSlider.value = 1;
+dSlider.value = 0;
+eSlider.value = 0;
 
-[aSelect, dSelect, eSelect].forEach(el => {
+[aSlider, dSlider, eSlider].forEach(el => {
   el.addEventListener("input", draw);
 });
 
 setMode("vertical");
+window.addEventListener("resize", draw);
 </script>
 </body>
 </html>

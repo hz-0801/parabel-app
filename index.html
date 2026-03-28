@@ -3,25 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verschiebung und Streckung der Normalparabel</title>
+<title>Manipulation Normalparabel</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: white;
+  background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+  color: #111;
 }
 
 .container {
-  padding: 10px;
-  max-width: 900px;
+  padding: 14px;
+  max-width: 950px;
   margin: 0 auto;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.hero-title {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f4c81 0%, #2563eb 55%, #60a5fa 100%);
+  color: white;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+}
+
+.hero-title h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0.2px;
+}
+
+.hero-title p {
+  margin: 6px 0 0 0;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mode-buttons button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 10px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #e8f0ff;
+  color: #1847a8;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.mode-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.mode-buttons button.active {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
 }
 
 .graph-wrap {
@@ -31,16 +77,18 @@ body {
 svg {
   width: 100%;
   height: 420px;
-  border: 1px solid #ddd;
-  background: #fafafa;
+  border: 1px solid #d8e1ea;
+  background: #fafcff;
   display: block;
+  border-radius: 16px;
 }
 
 .form-panel {
   padding: 12px 14px;
-  border: 1px solid #ddd;
-  border-radius: 14px;
-  background: #f8f8f8;
+  border: 1px solid #d8e1ea;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
 }
 
 .form-title {
@@ -57,6 +105,16 @@ svg {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
+}
+
+.param-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.param-group.hidden {
+  display: none;
 }
 
 select {
@@ -87,13 +145,25 @@ select {
   border-color: #bbb;
 }
 
+.helper-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #475569;
+}
+
+@media (max-width: 820px) {
+  .mode-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 700px) {
   svg {
     height: 380px;
   }
 
-  .title {
-    font-size: 20px;
+  .hero-title h1 {
+    font-size: 23px;
   }
 
   .vertex-form {
@@ -111,8 +181,16 @@ select {
     height: 360px;
   }
 
-  .title {
-    font-size: 18px;
+  .hero-title {
+    padding: 12px 14px;
+  }
+
+  .hero-title h1 {
+    font-size: 20px;
+  }
+
+  .hero-title p {
+    font-size: 13px;
   }
 
   .form-title {
@@ -128,6 +206,11 @@ select {
     min-width: 52px;
     padding: 4px 6px;
   }
+
+  .mode-buttons button {
+    font-size: 14px;
+    padding: 11px 8px;
+  }
 }
 </style>
 </head>
@@ -135,7 +218,17 @@ select {
 <body>
 
 <div class="container">
-  <div class="title">Verschiebung und Streckung der Normalparabel</div>
+  <div class="hero-title">
+    <h1>Manipulation Normalparabel</h1>
+    <p>Untersuche Verschiebung und Veränderung der Parabel im Vergleich zu x².</p>
+  </div>
+
+  <div class="mode-buttons">
+    <button id="btnVertical" class="active" onclick="setMode('vertical')">Vertikale Verschiebung</button>
+    <button id="btnHorizontal" onclick="setMode('horizontal')">Horizontale Verschiebung</button>
+    <button id="btnOpen" onclick="setMode('open')">Öffnungsfaktor</button>
+    <button id="btnAll" onclick="setMode('all')">Komplett</button>
+  </div>
 
   <div class="graph-wrap">
     <svg id="svg"></svg>
@@ -146,12 +239,25 @@ select {
 
     <div class="vertex-form">
       <span>f(x) =</span>
-      <select id="a"></select>
+
+      <span class="param-group" id="groupA">
+        <select id="a"></select>
+      </span>
+
       <span>(x -</span>
-      <select id="d"></select>
+
+      <span class="param-group" id="groupD">
+        <select id="d"></select>
+      </span>
+
       <span>)² +</span>
-      <select id="e"></select>
+
+      <span class="param-group" id="groupE">
+        <select id="e"></select>
+      </span>
     </div>
+
+    <div class="helper-text" id="helperText"></div>
   </div>
 </div>
 
@@ -161,7 +267,19 @@ const aSelect = document.getElementById("a");
 const dSelect = document.getElementById("d");
 const eSelect = document.getElementById("e");
 
+const groupA = document.getElementById("groupA");
+const groupD = document.getElementById("groupD");
+const groupE = document.getElementById("groupE");
+
+const helperText = document.getElementById("helperText");
+
+const btnVertical = document.getElementById("btnVertical");
+const btnHorizontal = document.getElementById("btnHorizontal");
+const btnOpen = document.getElementById("btnOpen");
+const btnAll = document.getElementById("btnAll");
+
 const xMin = -10, xMax = 10, yMin = -10, yMax = 10;
+let currentMode = "vertical";
 
 function toX(x, w) {
   return (x - xMin) / (xMax - xMin) * w;
@@ -199,6 +317,57 @@ function updateSelectColor(select) {
   }
 }
 
+function setActiveButton(activeBtn) {
+  [btnVertical, btnHorizontal, btnOpen, btnAll].forEach(btn => {
+    btn.classList.remove("active");
+  });
+  activeBtn.classList.add("active");
+}
+
+function setMode(mode) {
+  currentMode = mode;
+
+  if (mode === "vertical") {
+    groupA.classList.add("hidden");
+    groupD.classList.add("hidden");
+    groupE.classList.remove("hidden");
+    aSelect.value = 1;
+    dSelect.value = 0;
+    helperText.textContent = "Nur die vertikale Verschiebung wird verändert.";
+    setActiveButton(btnVertical);
+  }
+
+  if (mode === "horizontal") {
+    groupA.classList.add("hidden");
+    groupD.classList.remove("hidden");
+    groupE.classList.add("hidden");
+    aSelect.value = 1;
+    eSelect.value = 0;
+    helperText.textContent = "Nur die horizontale Verschiebung wird verändert.";
+    setActiveButton(btnHorizontal);
+  }
+
+  if (mode === "open") {
+    groupA.classList.remove("hidden");
+    groupD.classList.add("hidden");
+    groupE.classList.add("hidden");
+    dSelect.value = 0;
+    eSelect.value = 0;
+    helperText.textContent = "Nur der Öffnungsfaktor wird verändert.";
+    setActiveButton(btnOpen);
+  }
+
+  if (mode === "all") {
+    groupA.classList.remove("hidden");
+    groupD.classList.remove("hidden");
+    groupE.classList.remove("hidden");
+    helperText.textContent = "Alle Parameter können gemeinsam verändert werden.";
+    setActiveButton(btnAll);
+  }
+
+  draw();
+}
+
 function draw() {
   const a = parseInt(aSelect.value, 10);
   const d = parseInt(dSelect.value, 10);
@@ -213,27 +382,23 @@ function draw() {
 
   svg.innerHTML = "";
 
-  // Raster
   for (let x = Math.ceil(xMin); x <= xMax; x++) {
     const px = toX(x, w);
-    svg.innerHTML += `<line x1="${px}" y1="0" x2="${px}" y2="${h}" stroke="#ddd" stroke-width="1"/>`;
+    svg.innerHTML += `<line x1="${px}" y1="0" x2="${px}" y2="${h}" stroke="#dde4ec" stroke-width="1"/>`;
   }
 
   for (let y = Math.ceil(yMin); y <= yMax; y++) {
     const py = toY(y, h);
-    svg.innerHTML += `<line x1="0" y1="${py}" x2="${w}" y2="${py}" stroke="#ddd" stroke-width="1"/>`;
+    svg.innerHTML += `<line x1="0" y1="${py}" x2="${w}" y2="${py}" stroke="#dde4ec" stroke-width="1"/>`;
   }
 
-  // Achsen
   svg.innerHTML += `<line x1="0" y1="${toY(0, h)}" x2="${w}" y2="${toY(0, h)}" stroke="black" stroke-width="2"/>`;
   svg.innerHTML += `<line x1="${toX(0, w)}" y1="0" x2="${toX(0, w)}" y2="${h}" stroke="black" stroke-width="2"/>`;
 
-  // Beschriftung Normalparabel
   const nx = -2.2;
   const ny = nx * nx;
   svg.innerHTML += `<text x="${toX(nx, w)}" y="${toY(ny, h) - 10}" fill="black" font-size="18" font-weight="bold">x²</text>`;
 
-  // Normalparabel
   let p1 = "";
   for (let i = 0; i <= 900; i++) {
     const x = xMin + i * (xMax - xMin) / 900;
@@ -242,7 +407,6 @@ function draw() {
   }
   svg.innerHTML += `<polyline points="${p1}" fill="none" stroke="black" stroke-width="4"/>`;
 
-  // Vergleichsparabel
   let p2 = "";
   for (let i = 0; i <= 900; i++) {
     const x = xMin + i * (xMax - xMin) / 900;
@@ -251,12 +415,10 @@ function draw() {
   }
   svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="blue" stroke-width="4"/>`;
 
-  // Scheitelpunkt nur als roter Punkt
   const px = toX(d, w);
   const py = toY(e, h);
   svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
 
-  // Funktionsgleichung an die blaue Parabel schreiben
   const labelXValue = d + 1.2;
   const labelYValue = a * Math.pow(labelXValue - d, 2) + e;
   const labelText = `f(x) = ${snum(a)}(x - ${snum(d)})² + ${snum(e)}`;
@@ -289,7 +451,7 @@ eSelect.value = 0;
   el.addEventListener("change", draw);
 });
 
-draw();
+setMode("vertical");
 </script>
 
 </body>

@@ -14,69 +14,71 @@ body {
 
 .container {
   padding: 10px;
-}
-
-.formula {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 14px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .graph-wrap {
   margin-bottom: 18px;
 }
 
-.buttons {
+svg {
+  width: 100%;
+  height: 420px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.form-panel {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  background: #f8f8f8;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.vertex-form {
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1.6;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 12px;
-  background: #2563eb;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.sliders {
-  margin-top: 8px;
-}
-
-.slider-row {
-  display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 8px;
+}
+
+select {
   font-size: 22px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #bbb;
+  background: white;
 }
 
-.slider-row label {
-  width: 28px;
-  font-weight: bold;
-}
-
-.slider-row input[type="range"] {
-  flex: 1;
-  height: 40px;
-}
-
-.slider-value {
-  width: 52px;
-  text-align: right;
+.info {
+  margin-top: 14px;
   font-size: 18px;
   color: #333;
 }
 
-svg {
-  width: 100%;
-  height: 360px;
-  border: 1px solid #ddd;
-  background: #fafafa;
+@media (max-width: 600px) {
+  .vertex-form {
+    font-size: 22px;
+  }
+
+  select {
+    font-size: 18px;
+  }
+
+  svg {
+    height: 360px;
+  }
 }
 </style>
 </head>
@@ -85,47 +87,40 @@ svg {
 
 <div class="container">
 
-<div class="formula" id="formula">g(x) = 1(x - 0)² + 0</div>
-
-<div class="graph-wrap">
-  <svg id="svg"></svg>
-</div>
-
-<div class="buttons">
-  <button onclick="setValues(1,0,0)">Normal</button>
-  <button onclick="setValues(0.5,0,0)">Breit</button>
-  <button onclick="setValues(2,0,0)">Schmal</button>
-  <button onclick="setValues(1,-3,2)">Verschoben</button>
-</div>
-
-<div class="sliders">
-  <div class="slider-row">
-    <label for="a">a:</label>
-    <input id="a" type="range" min="-3" max="3" step="0.1" value="1">
-    <div class="slider-value" id="aVal">1.0</div>
+  <div class="graph-wrap">
+    <svg id="svg"></svg>
   </div>
 
-  <div class="slider-row">
-    <label for="d">d:</label>
-    <input id="d" type="range" min="-8" max="8" step="0.1" value="0">
-    <div class="slider-value" id="dVal">0.0</div>
-  </div>
+  <div class="form-panel">
+    <div class="form-title">Scheitelpunktform</div>
 
-  <div class="slider-row">
-    <label for="e">e:</label>
-    <input id="e" type="range" min="-8" max="8" step="0.1" value="0">
-    <div class="slider-value" id="eVal">0.0</div>
+    <div class="vertex-form">
+      <span>g(x) =</span>
+
+      <select id="a"></select>
+
+      <span>(x -</span>
+
+      <select id="d"></select>
+
+      <span>)² +</span>
+
+      <select id="e"></select>
+    </div>
+
+    <div class="info" id="infoText">
+      Normalparabel: f(x) = x²
+    </div>
   </div>
-</div>
 
 </div>
 
 <script>
 const svg = document.getElementById("svg");
-const formula = document.getElementById("formula");
-const aVal = document.getElementById("aVal");
-const dVal = document.getElementById("dVal");
-const eVal = document.getElementById("eVal");
+const infoText = document.getElementById("infoText");
+const aSelect = document.getElementById("a");
+const dSelect = document.getElementById("d");
+const eSelect = document.getElementById("e");
 
 const xMin = -10, xMax = 10, yMin = -10, yMax = 10;
 
@@ -137,23 +132,25 @@ function toY(y, h) {
   return h - (y - yMin) / (yMax - yMin) * h;
 }
 
-function fnum(n) {
-  return (Math.round(n * 10) / 10).toFixed(1);
+function snum(n) {
+  return Number(n).toString();
 }
 
-function snum(n) {
-  return (Math.round(n * 10) / 10).toString();
+function populateSelect(select, start, end, skipZero = false) {
+  select.innerHTML = "";
+  for (let i = start; i <= end; i++) {
+    if (skipZero && i === 0) continue;
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = i;
+    select.appendChild(option);
+  }
 }
 
 function draw() {
-  const a = parseFloat(document.getElementById("a").value);
-  const d = parseFloat(document.getElementById("d").value);
-  const e = parseFloat(document.getElementById("e").value);
-
-  aVal.textContent = fnum(a);
-  dVal.textContent = fnum(d);
-  eVal.textContent = fnum(e);
-  formula.textContent = `g(x) = ${snum(a)}(x - ${snum(d)})² + ${snum(e)}`;
+  const a = parseInt(aSelect.value, 10);
+  const d = parseInt(dSelect.value, 10);
+  const e = parseInt(eSelect.value, 10);
 
   const w = svg.clientWidth;
   const h = svg.clientHeight;
@@ -172,24 +169,24 @@ function draw() {
   }
 
   // Achsen
-  svg.innerHTML += `<line x1="0" y1="${toY(0,h)}" x2="${w}" y2="${toY(0,h)}" stroke="black" stroke-width="2"/>`;
-  svg.innerHTML += `<line x1="${toX(0,w)}" y1="0" x2="${toX(0,w)}" y2="${h}" stroke="black" stroke-width="2"/>`;
+  svg.innerHTML += `<line x1="0" y1="${toY(0, h)}" x2="${w}" y2="${toY(0, h)}" stroke="black" stroke-width="2"/>`;
+  svg.innerHTML += `<line x1="${toX(0, w)}" y1="0" x2="${toX(0, w)}" y2="${h}" stroke="black" stroke-width="2"/>`;
 
   // Normalparabel
   let p1 = "";
-  for (let i = 0; i < 700; i++) {
-    let x = xMin + i * (xMax - xMin) / 700;
-    let y = x * x;
-    p1 += `${toX(x,w)},${toY(y,h)} `;
+  for (let i = 0; i <= 900; i++) {
+    const x = xMin + i * (xMax - xMin) / 900;
+    const y = x * x;
+    p1 += `${toX(x, w)},${toY(y, h)} `;
   }
   svg.innerHTML += `<polyline points="${p1}" fill="none" stroke="black" stroke-width="4"/>`;
 
   // Vergleichsparabel
   let p2 = "";
-  for (let i = 0; i < 700; i++) {
-    let x = xMin + i * (xMax - xMin) / 700;
-    let y = a * Math.pow(x - d, 2) + e;
-    p2 += `${toX(x,w)},${toY(y,h)} `;
+  for (let i = 0; i <= 900; i++) {
+    const x = xMin + i * (xMax - xMin) / 900;
+    const y = a * Math.pow(x - d, 2) + e;
+    p2 += `${toX(x, w)},${toY(y, h)} `;
   }
   svg.innerHTML += `<polyline points="${p2}" fill="none" stroke="blue" stroke-width="4"/>`;
 
@@ -199,18 +196,21 @@ function draw() {
   const label = `S(${snum(d)} | ${snum(e)})`;
 
   svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
-  svg.innerHTML += `<line x1="${px}" y1="${py}" x2="${px+18}" y2="${py-18}" stroke="red" stroke-width="2"/>`;
-  svg.innerHTML += `<text x="${px+22}" y="${py-22}" fill="red" font-size="18" font-weight="bold">${label}</text>`;
+  svg.innerHTML += `<line x1="${px}" y1="${py}" x2="${px + 18}" y2="${py - 18}" stroke="red" stroke-width="2"/>`;
+  svg.innerHTML += `<text x="${px + 22}" y="${py - 22}" fill="red" font-size="18" font-weight="bold">${label}</text>`;
+
+  infoText.textContent = `Normalparabel: f(x) = x²   |   Scheitelpunkt der blauen Parabel: S(${d} | ${e})`;
 }
 
-function setValues(A, D, E) {
-  document.getElementById("a").value = A;
-  document.getElementById("d").value = D;
-  document.getElementById("e").value = E;
-  draw();
-}
+populateSelect(aSelect, -5, 5, true);
+populateSelect(dSelect, -5, 5, false);
+populateSelect(eSelect, -5, 5, false);
 
-document.querySelectorAll("input").forEach(i => i.oninput = draw);
+aSelect.value = 1;
+dSelect.value = 0;
+eSelect.value = 0;
+
+[aSelect, dSelect, eSelect].forEach(el => el.addEventListener("change", draw));
 
 draw();
 </script>

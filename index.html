@@ -35,12 +35,6 @@ body {
   letter-spacing: 0.2px;
 }
 
-.hero-title p {
-  margin: 6px 0 0 0;
-  font-size: 14px;
-  opacity: 0.95;
-}
-
 .mode-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -101,48 +95,44 @@ svg {
   font-size: 24px;
   font-weight: bold;
   line-height: 1.6;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  margin-bottom: 14px;
+  color: #1847a8;
+}
+
+.slider-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.slider-group {
+  display: grid;
   gap: 6px;
 }
 
-.param-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.param-group.hidden {
+.slider-group.hidden {
   display: none;
 }
 
-select {
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 10px;
-  border: 1px solid #bbb;
-  background: white;
-  font-weight: bold;
-  min-width: 64px;
+.slider-group label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+input[type="range"] {
+  width: 100%;
 }
 
 .value-negative {
   color: #c62828;
-  background: #fff1f1;
-  border-color: #e3aaaa;
 }
 
 .value-positive {
   color: #1565c0;
-  background: #eef5ff;
-  border-color: #aac7ef;
 }
 
 .value-zero {
   color: #111;
-  background: white;
-  border-color: #bbb;
 }
 
 .helper-text {
@@ -169,11 +159,6 @@ select {
   .vertex-form {
     font-size: 20px;
   }
-
-  select {
-    font-size: 16px;
-    min-width: 56px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -189,22 +174,12 @@ select {
     font-size: 20px;
   }
 
-  .hero-title p {
-    font-size: 13px;
-  }
-
   .form-title {
     font-size: 14px;
   }
 
   .vertex-form {
     font-size: 17px;
-  }
-
-  select {
-    font-size: 15px;
-    min-width: 52px;
-    padding: 4px 6px;
   }
 
   .mode-buttons button {
@@ -216,18 +191,16 @@ select {
 </head>
 
 <body>
-
 <div class="container">
   <div class="hero-title">
     <h1>Manipulation Normalparabel</h1>
-    <p>Untersuche Verschiebung und Veränderung der Parabel im Vergleich zu x².</p>
   </div>
 
   <div class="mode-buttons">
-    <button id="btnVertical" class="active" onclick="setMode('vertical')">Vertikale Verschiebung</button>
-    <button id="btnHorizontal" onclick="setMode('horizontal')">Horizontale Verschiebung</button>
-    <button id="btnOpen" onclick="setMode('open')">Öffnungsfaktor</button>
-    <button id="btnAll" onclick="setMode('all')">Komplett</button>
+    <button id="btnVertical" class="active" onclick="setMode('vertical')">Verschiebung in y-Richtung</button>
+    <button id="btnHorizontal" onclick="setMode('horizontal')">Verschiebung in x-Richtung</button>
+    <button id="btnOpen" onclick="setMode('open')">Streckung / Stauchung</button>
+    <button id="btnAll" onclick="setMode('all')">Alle Parameter</button>
   </div>
 
   <div class="graph-wrap">
@@ -235,26 +208,24 @@ select {
   </div>
 
   <div class="form-panel">
-    <div class="form-title">Scheitelpunktform</div>
+    <div class="form-title">Funktionsform</div>
+    <div class="vertex-form" id="formulaDisplay"></div>
 
-    <div class="vertex-form">
-      <span>f(x) =</span>
+    <div class="slider-panel">
+      <div class="slider-group" id="groupA">
+        <label for="a">a = <span id="aValue"></span></label>
+        <input type="range" id="a" min="-5" max="5" step="1">
+      </div>
 
-      <span class="param-group" id="groupA">
-        <select id="a"></select>
-      </span>
+      <div class="slider-group" id="groupD">
+        <label for="d">d = <span id="dValue"></span></label>
+        <input type="range" id="d" min="-5" max="5" step="1">
+      </div>
 
-      <span>(x -</span>
-
-      <span class="param-group" id="groupD">
-        <select id="d"></select>
-      </span>
-
-      <span>)² +</span>
-
-      <span class="param-group" id="groupE">
-        <select id="e"></select>
-      </span>
+      <div class="slider-group" id="groupE">
+        <label for="e">e = <span id="eValue"></span></label>
+        <input type="range" id="e" min="-5" max="5" step="1">
+      </div>
     </div>
 
     <div class="helper-text" id="helperText"></div>
@@ -266,6 +237,11 @@ const svg = document.getElementById("svg");
 const aSelect = document.getElementById("a");
 const dSelect = document.getElementById("d");
 const eSelect = document.getElementById("e");
+
+const aValue = document.getElementById("aValue");
+const dValue = document.getElementById("dValue");
+const eValue = document.getElementById("eValue");
+const formulaDisplay = document.getElementById("formulaDisplay");
 
 const groupA = document.getElementById("groupA");
 const groupD = document.getElementById("groupD");
@@ -293,27 +269,41 @@ function snum(n) {
   return Number(n).toString();
 }
 
-function populateSelect(select, start, end, skipZero = false) {
-  select.innerHTML = "";
-  for (let i = start; i <= end; i++) {
-    if (skipZero && i === 0) continue;
-    const option = document.createElement("option");
-    option.value = i;
-    option.textContent = i;
-    select.appendChild(option);
+function formatSigned(n) {
+  return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`;
+}
+
+function formatInner(d) {
+  return d >= 0 ? `(x - ${d})²` : `(x + ${Math.abs(d)})²`;
+}
+
+function updateValueColor(element, value) {
+  element.classList.remove("value-negative", "value-positive", "value-zero");
+
+  if (value < 0) {
+    element.classList.add("value-negative");
+  } else if (value > 0) {
+    element.classList.add("value-positive");
+  } else {
+    element.classList.add("value-zero");
   }
 }
 
-function updateSelectColor(select) {
-  const value = parseInt(select.value, 10);
-  select.classList.remove("value-negative", "value-positive", "value-zero");
+function updateFormula(a, d, e) {
+  if (currentMode === "vertical") {
+    formulaDisplay.textContent = `f(x) = x² ${formatSigned(e)}`;
+  }
 
-  if (value < 0) {
-    select.classList.add("value-negative");
-  } else if (value > 0) {
-    select.classList.add("value-positive");
-  } else {
-    select.classList.add("value-zero");
+  if (currentMode === "horizontal") {
+    formulaDisplay.textContent = `f(x) = ${formatInner(d)}`;
+  }
+
+  if (currentMode === "open") {
+    formulaDisplay.textContent = `f(x) = ${a}x²`;
+  }
+
+  if (currentMode === "all") {
+    formulaDisplay.textContent = `f(x) = ${a}${formatInner(d)} ${formatSigned(e)}`;
   }
 }
 
@@ -333,7 +323,7 @@ function setMode(mode) {
     groupE.classList.remove("hidden");
     aSelect.value = 1;
     dSelect.value = 0;
-    helperText.textContent = "Nur die vertikale Verschiebung wird verändert.";
+    helperText.textContent = "Verschiebung der Normalparabel nach oben oder unten: f(x) = x² + e";
     setActiveButton(btnVertical);
   }
 
@@ -343,7 +333,7 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     aSelect.value = 1;
     eSelect.value = 0;
-    helperText.textContent = "Nur die horizontale Verschiebung wird verändert.";
+    helperText.textContent = "Verschiebung der Normalparabel nach links oder rechts: f(x) = (x - d)²";
     setActiveButton(btnHorizontal);
   }
 
@@ -353,7 +343,7 @@ function setMode(mode) {
     groupE.classList.add("hidden");
     dSelect.value = 0;
     eSelect.value = 0;
-    helperText.textContent = "Nur der Öffnungsfaktor wird verändert.";
+    helperText.textContent = "Streckung oder Stauchung der Normalparabel: f(x) = ax²";
     setActiveButton(btnOpen);
   }
 
@@ -361,7 +351,7 @@ function setMode(mode) {
     groupA.classList.remove("hidden");
     groupD.classList.remove("hidden");
     groupE.classList.remove("hidden");
-    helperText.textContent = "Alle Parameter können gemeinsam verändert werden.";
+    helperText.textContent = "Manipulation mit allen Parametern: f(x) = a(x - d)² + e";
     setActiveButton(btnAll);
   }
 
@@ -373,9 +363,14 @@ function draw() {
   const d = parseInt(dSelect.value, 10);
   const e = parseInt(eSelect.value, 10);
 
-  updateSelectColor(aSelect);
-  updateSelectColor(dSelect);
-  updateSelectColor(eSelect);
+  aValue.textContent = a;
+  dValue.textContent = d;
+  eValue.textContent = e;
+
+  updateValueColor(aValue, a);
+  updateValueColor(dValue, d);
+  updateValueColor(eValue, e);
+  updateFormula(a, d, e);
 
   const w = svg.clientWidth;
   const h = svg.clientHeight;
@@ -439,20 +434,15 @@ function draw() {
   svg.innerHTML += `<text x="${textX}" y="${textY}" text-anchor="${anchor}" fill="blue" font-size="18" font-weight="bold">${labelText}</text>`;
 }
 
-populateSelect(aSelect, -5, 5, true);
-populateSelect(dSelect, -5, 5, false);
-populateSelect(eSelect, -5, 5, false);
-
 aSelect.value = 1;
 dSelect.value = 0;
 eSelect.value = 0;
 
 [aSelect, dSelect, eSelect].forEach(el => {
-  el.addEventListener("change", draw);
+  el.addEventListener("input", draw);
 });
 
 setMode("vertical");
 </script>
-
 </body>
 </html>

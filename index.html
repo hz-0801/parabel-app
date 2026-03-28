@@ -18,6 +18,10 @@ body {
   margin: 0 auto;
 }
 
+.graph-section {
+  position: relative;
+}
+
 .graph-wrap {
   margin-bottom: 18px;
 }
@@ -27,57 +31,137 @@ svg {
   height: 420px;
   border: 1px solid #ddd;
   background: #fafafa;
+  display: block;
 }
 
 .form-panel {
-  margin-top: 10px;
-  padding: 14px;
-  border: 1px solid #ddd;
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: min(320px, 42vw);
+  padding: 12px 14px;
+  border: 1px solid rgba(180,180,180,0.8);
   border-radius: 14px;
-  background: #f8f8f8;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
 }
 
 .form-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .vertex-form {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: bold;
   line-height: 1.6;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 select {
-  font-size: 22px;
-  padding: 6px 10px;
+  font-size: 18px;
+  padding: 4px 8px;
   border-radius: 10px;
   border: 1px solid #bbb;
-  background: white;
+  background: rgba(255,255,255,0.92);
+  font-weight: bold;
+  min-width: 64px;
+}
+
+.value-negative {
+  color: #c62828;
+  border-color: #e6a2a2;
+  background: rgba(255, 235, 235, 0.95);
+}
+
+.value-positive {
+  color: #1565c0;
+  border-color: #9fc2ef;
+  background: rgba(235, 244, 255, 0.95);
+}
+
+.value-zero {
+  color: #111;
+  border-color: #bbb;
+  background: rgba(255,255,255,0.95);
 }
 
 .info {
-  margin-top: 14px;
-  font-size: 18px;
+  margin-top: 10px;
+  font-size: 14px;
   color: #333;
+  line-height: 1.4;
 }
 
-@media (max-width: 600px) {
-  .vertex-form {
-    font-size: 22px;
+.legend-row {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.legend-neg {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.legend-pos {
+  color: #1565c0;
+  font-weight: bold;
+}
+
+@media (max-width: 700px) {
+  svg {
+    height: 380px;
   }
 
-  select {
+  .form-panel {
+    width: 230px;
+    right: 10px;
+    bottom: 10px;
+    padding: 10px 12px;
+  }
+
+  .vertex-form {
     font-size: 18px;
   }
 
+  select {
+    font-size: 16px;
+    min-width: 56px;
+  }
+}
+
+@media (max-width: 480px) {
   svg {
     height: 360px;
+  }
+
+  .form-panel {
+    width: 210px;
+  }
+
+  .form-title {
+    font-size: 14px;
+  }
+
+  .vertex-form {
+    font-size: 16px;
+  }
+
+  select {
+    font-size: 15px;
+    min-width: 52px;
+    padding: 4px 6px;
+  }
+
+  .info {
+    font-size: 12px;
   }
 }
 </style>
@@ -86,33 +170,33 @@ select {
 <body>
 
 <div class="container">
-
-  <div class="graph-wrap">
-    <svg id="svg"></svg>
-  </div>
-
-  <div class="form-panel">
-    <div class="form-title">Scheitelpunktform</div>
-
-    <div class="vertex-form">
-      <span>g(x) =</span>
-
-      <select id="a"></select>
-
-      <span>(x -</span>
-
-      <select id="d"></select>
-
-      <span>)² +</span>
-
-      <select id="e"></select>
+  <div class="graph-section">
+    <div class="graph-wrap">
+      <svg id="svg"></svg>
     </div>
 
-    <div class="info" id="infoText">
-      Normalparabel: f(x) = x²
+    <div class="form-panel">
+      <div class="form-title">Scheitelpunktform</div>
+
+      <div class="vertex-form">
+        <span>g(x) =</span>
+        <select id="a"></select>
+        <span>(x -</span>
+        <select id="d"></select>
+        <span>)² +</span>
+        <select id="e"></select>
+      </div>
+
+      <div class="info" id="infoText">
+        Normalparabel: f(x) = x²
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-neg">negativ</span> |
+        <span class="legend-pos">positiv</span>
+      </div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -147,10 +231,27 @@ function populateSelect(select, start, end, skipZero = false) {
   }
 }
 
+function updateSelectColor(select) {
+  const value = parseInt(select.value, 10);
+  select.classList.remove("value-negative", "value-positive", "value-zero");
+
+  if (value < 0) {
+    select.classList.add("value-negative");
+  } else if (value > 0) {
+    select.classList.add("value-positive");
+  } else {
+    select.classList.add("value-zero");
+  }
+}
+
 function draw() {
   const a = parseInt(aSelect.value, 10);
   const d = parseInt(dSelect.value, 10);
   const e = parseInt(eSelect.value, 10);
+
+  updateSelectColor(aSelect);
+  updateSelectColor(dSelect);
+  updateSelectColor(eSelect);
 
   const w = svg.clientWidth;
   const h = svg.clientHeight;
@@ -195,11 +296,27 @@ function draw() {
   const py = toY(e, h);
   const label = `S(${snum(d)} | ${snum(e)})`;
 
-  svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
-  svg.innerHTML += `<line x1="${px}" y1="${py}" x2="${px + 18}" y2="${py - 18}" stroke="red" stroke-width="2"/>`;
-  svg.innerHTML += `<text x="${px + 22}" y="${py - 22}" fill="red" font-size="18" font-weight="bold">${label}</text>`;
+  let labelDx = 18;
+  let labelDy = -18;
+  let textX = px + 22;
+  let textY = py - 22;
+  let anchor = "start";
 
-  infoText.textContent = `Normalparabel: f(x) = x²   |   Scheitelpunkt der blauen Parabel: S(${d} | ${e})`;
+  if (px > w - 120) {
+    labelDx = -18;
+    textX = px - 22;
+    anchor = "end";
+  }
+  if (py < 30) {
+    labelDy = 18;
+    textY = py + 28;
+  }
+
+  svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="red"/>`;
+  svg.innerHTML += `<line x1="${px}" y1="${py}" x2="${px + labelDx}" y2="${py + labelDy}" stroke="red" stroke-width="2"/>`;
+  svg.innerHTML += `<text x="${textX}" y="${textY}" text-anchor="${anchor}" fill="red" font-size="18" font-weight="bold">${label}</text>`;
+
+  infoText.textContent = `Normalparabel: f(x) = x² | Scheitelpunkt: S(${d} | ${e}) | a = ${a}`;
 }
 
 populateSelect(aSelect, -5, 5, true);
@@ -210,7 +327,9 @@ aSelect.value = 1;
 dSelect.value = 0;
 eSelect.value = 0;
 
-[aSelect, dSelect, eSelect].forEach(el => el.addEventListener("change", draw));
+[aSelect, dSelect, eSelect].forEach(el => {
+  el.addEventListener("change", draw);
+});
 
 draw();
 </script>
